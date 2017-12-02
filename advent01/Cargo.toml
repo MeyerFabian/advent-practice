@@ -2,6 +2,3 @@
 name = "advent01"
 version = "0.1.0"
 authors = ["MeyerFabian <fabian.meyer1337@web.de>"]
-
-[dependencies]
-itertools= "0.7.3"
