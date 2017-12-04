@@ -95,9 +95,86 @@ pub fn norm_1_spiral_pattern(s_n: i32) -> i32 {
     return nth_circle + index_fq;
 }
 
+// Fill grid with nxn zeroes
+fn fill_grid_with_zeroes(grid: &mut Vec<Vec<i32>>, n: usize) {
+    for i in 0..n {
+        grid.push(std::iter::repeat(0).take(n).collect());
+    }
+}
+// Calc steps that we go in the same direction [1,1,2,2,3,3,4,4,5,5,6,6,7,..]
+fn calc_steps(mv_vec: &mut Vec<usize>, n: usize) {
+    let mut steps = 0;
+    let mut i = 1;
+    loop {
+        mv_vec.push(i);
+        mv_vec.push(i);
+
+        steps += 2 * i;
+        i += 1;
+        if steps > (n - 2) * (n - 2) {
+            break;
+        }
+    }
+}
+
+// Spiral algorithm
+fn sum_spiral(grid: &mut Vec<Vec<i32>>, start: (usize, usize), n: usize, input: i32) {
+    //bigger filters then 3x3 would be possible
+    let filter1D = [-1, 0, 1];
+
+    //At the start midpoint
+    let mut x = start.0;
+    let mut y = start.1;
+
+    let mut move_vec = Vec::new();
+    calc_steps(&mut move_vec, n);
+
+
+    //cycle is always the same right,up,left,down
+    let mut move_cycle = [(0, 1), (-1, 0), (0, -1), (1, 0)];
+    let mut move_cycle_iter = move_cycle.iter().cycle();
+
+    for num_steps in move_vec {
+        // get the next move direction
+        let &(m_y, m_x) = move_cycle_iter.next().unwrap();
+        for step in 0..num_steps {
+            // move to the next direction, which is now midpoint for filter
+            x = (x as i32 + m_x) as usize;
+            y = (y as i32 + m_y) as usize;
+            let mut sum = 0;
+            //filter around new midpoint
+            for j in filter1D.iter() {
+                for i in filter1D.iter() {
+                    let ix = (x as i32 + i) as usize;
+                    let iy = (y as i32 + j) as usize;
+                    sum += grid[iy][ix];
+                }
+            }
+            // advent asks for number bigger than my indiv. number so we just abort then
+            if (sum > input) {
+                println!{"value bigger than input: {}",sum};
+                return;
+            }
+            grid[y][x] = sum;
+        }
+    }
+}
 fn main() {
     let input: i32 = 368078;
     println!("norm1 {}", norm_1_spiral_pattern(input));
+
+    let mut grid = Vec::new();
+    let grid_length = 15;
+    let midpoint = grid_length / 2;
+
+    fill_grid_with_zeroes(&mut grid, grid_length);
+
+    grid[midpoint][midpoint] = 1;
+
+    sum_spiral(&mut grid, (midpoint, midpoint), grid_length - 2, input);
+    for i in grid.iter() {
+        println!("{:?}", i);
+    }
 }
 
 #[cfg(test)]
