@@ -138,7 +138,7 @@ fn sum_spiral(grid: &mut Vec<Vec<i32>>, start: (usize, usize), n: usize, input: 
         // get the next move direction
         let &(m_y, m_x) = move_cycle_iter.next().unwrap();
         for step in 0..num_steps {
-            // move to the next direction, which is now midpoint for filter
+            // move to the next point, which is now midpoint for filter
             x = (x as i32 + m_x) as usize;
             y = (y as i32 + m_y) as usize;
             let mut sum = 0;
