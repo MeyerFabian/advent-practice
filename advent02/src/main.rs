@@ -38,14 +38,14 @@ fn main() {
 
 //     In this example, the spreadsheet's checksum would be 8 + 4 + 6 = 18.
 
-fn sum_max_min(data: &Vec<i32>) -> i32 {
+fn sum_max_min(data: &[i32]) -> i32 {
     return data.iter().max().unwrap() - data.iter().min().unwrap();
 }
 
 // It sounds like the goal is to find the only two numbers in each row
 // where one evenly divides the other - that is,
 // where the result of the division operation is a whole number.
-// They would like you to find those numbers on each line, divide them,
+// They would lie you to find those numbers on each line, divide them,
 // and add up each line's result.
 
 //     For example, given the following spreadsheet:
@@ -61,17 +61,21 @@ fn sum_max_min(data: &Vec<i32>) -> i32 {
 
 //     In this example, the sum of the results would be 4 + 3 + 2 = 9.
 
-fn sum_even_divided(data: &Vec<i32>) -> i32 {
+fn sum_even_divided(data: &[i32]) -> i32 {
     let mut sum2 = 0;
-    for (i, c) in data.iter().enumerate() {
-        for a in data.iter().skip(i + 1) {
-            if c % a == 0 {
-                sum2 += c / a;
-            }
-            if a % c == 0 {
-                sum2 += a / c;
-            }
-        }
-    }
-    return sum2;
+    data.iter()
+        .enumerate()
+        .map(|(i, a)| {
+            data.iter().skip(i + 1).fold(0, |acc, c| {
+                let mut  v = 0;
+                if c % a == 0 {
+                    v = c / a
+                }
+                if a % c == 0 {
+                    v = a / c
+                };
+                acc + v
+            })
+        })
+        .sum()
 }

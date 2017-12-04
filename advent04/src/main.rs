@@ -12,10 +12,10 @@ fn valid_words_in_lines(contents: &String, f: fn(&str, &str) -> bool) -> usize {
     let invalid: usize = v.iter()
         .map(|a| {
             a.iter().enumerate().fold(0, |acc, (i, d)| {
-                let found = a.iter().skip(i + 1).find(|&c| f(d, c));
                 if acc != 0 {
                     1
                 } else {
+                    let found = a.iter().skip(i + 1).find(|&c| f(d, c));
                     match found {
                         Some(_) => 1,
                         None => 0,
@@ -65,6 +65,7 @@ mod tests {
 what what is going
 blub tar rat"
             .to_string();
+        valid_words_in_lines(&contents,equals);
         assert_eq!(1, valid_words_in_lines(&contents, equals));
         assert_eq!(0, valid_words_in_lines(&contents, anagram));
     }
