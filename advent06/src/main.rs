@@ -38,55 +38,59 @@ use std::io::Read;
 // and so the answer in this example is 5.
 
 //Find the maximum i32 in a list, first occurence wins tiebreaker
-fn max (v:&[i32])->(usize,i32){
-    let a = v.iter().enumerate().rev().max_by(|&(_,x),&(_,y)| x.cmp(y)).unwrap();
-    (a.0,*a.1)
+fn max(v: &[i32]) -> (usize, i32) {
+    let a = v.iter()
+        .enumerate()
+        .rev()
+        .max_by(|&(_, x), &(_, y)| x.cmp(y))
+        .unwrap();
+    (a.0, *a.1)
 }
 
 // We iterate only one time over the vector and calc due to length,
 // distance and index how mch blocks corresponding index gets.
-fn cycle(v:&mut [i32]){
+fn cycle(v: &mut [i32]) {
     let a = max(v);
-    v[a.0]=0;
+    v[a.0] = 0;
     let v_len = v.len();
-    for (i,elem) in v.iter_mut().enumerate(){
-        let new_i =((i +v_len-a.0 -1)%v_len) as i32 ;
-        let occ = (a.1 -new_i + v_len as i32-1)/v_len as i32;
-        *elem+= occ;
+    for (i, elem) in v.iter_mut().enumerate() {
+        let new_i = ((i + v_len - a.0 - 1) % v_len) as i32;
+        let occ = (a.1 - new_i + v_len as i32 - 1) / v_len as i32;
+        *elem += occ;
     }
 }
 
-fn reallocation(v:&[i32]) -> (usize,usize){
-    let mut v_collection =vec![v.to_vec()];
+fn reallocation(v: &[i32]) -> (usize, usize) {
+    let mut v_collection = vec![v.to_vec()];
     let mut v_clone = v.to_vec();
-    let mut step:usize =0;
-    loop{
-        step+=1;
+    let mut step: usize = 0;
+    loop {
+        step += 1;
 
         //cycle
         cycle(&mut v_clone);
 
         //routine to find if step was already employed
-        let mut found =true;
-        for (ind,row) in v_collection.iter().enumerate(){
+        let mut found = true;
+        for (ind, row) in v_collection.iter().enumerate() {
             let mut v_c_iter = v_clone.iter();
             found = true;
-            for i in row{
-                found = found && (Some(i)==v_c_iter.next());
-                    if!found{
-                        break;
-                    }
+            for i in row {
+                found = found && (Some(i) == v_c_iter.next());
+                if !found {
+                    break;
+                }
             }
-            if found{
+            if found {
                 //immediately return if we found a reoccurence of state
-                return (step,step-ind);
+                return (step, step - ind);
             }
         }
         //push every state in a big vector
         v_collection.push(v_clone.to_vec());
     }
     //error case
-    (0,0)
+    (0, 0)
 }
 
 fn main() {
@@ -94,9 +98,12 @@ fn main() {
     let mut contents = String::new();
     file.read_to_string(&mut contents);
 
-    let v = contents.split("\t").map(|d| d.parse::<i32>().unwrap()).collect::<Vec<_>>();
-    let (steps,loopsize) = reallocation(&v);
-    println!("steps {} loopsize {}",steps,loopsize);
+    let v = contents
+        .split("\t")
+        .map(|d| d.parse::<i32>().unwrap())
+        .collect::<Vec<_>>();
+    let (steps, loopsize) = reallocation(&v);
+    println!("steps {} loopsize {}", steps, loopsize);
 }
 #[cfg(test)]
 mod tests {
@@ -104,19 +111,19 @@ mod tests {
 
     #[test]
     fn reall_test() {
-        let mut v = vec![0,2,7,0];
-        let (steps,loopsize) = reallocation(& v);
-        assert_eq!(5,steps);
-        assert_eq!(4,loopsize);
+        let mut v = vec![0, 2, 7, 0];
+        let (steps, loopsize) = reallocation(&v);
+        assert_eq!(5, steps);
+        assert_eq!(4, loopsize);
     }
     #[test]
     fn cycle_test() {
-        let mut v = vec![0,2,7,0];
+        let mut v = vec![0, 2, 7, 0];
         cycle(&mut v);
         let mut viter = v.iter();
-        assert_eq!(Some(&2),viter.next());
-        assert_eq!(Some(&4),viter.next());
-        assert_eq!(Some(&1),viter.next());
-        assert_eq!(Some(&2),viter.next());
+        assert_eq!(Some(&2), viter.next());
+        assert_eq!(Some(&4), viter.next());
+        assert_eq!(Some(&1), viter.next());
+        assert_eq!(Some(&2), viter.next());
     }
 }
