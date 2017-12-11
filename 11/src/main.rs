@@ -47,6 +47,7 @@ fn shortest_path_alg(words: &[&str]) -> Vec<i32> {
     // Note: There exists no east and west directions
     // for which this also would hold!
     // We detect this by looking at equal signs of nw and ne direction.
+    // order is important! s or n has to come first
     detect_same_sign(&mut shortest_path, 1, 0, 2);
 
     // And Secondly:
