@@ -94,6 +94,8 @@ fn find_root_node<'a>(names: &[&'a str], flat_children: &[&&str]) -> Option<(usi
 // Given that exactly one program is the wrong weight,
 // what would its weight need to be to balance the entire tower?
 
+// Method to correct if we found an error in weights, could be much better,
+// but if catches the given error everytime.
 fn error_recovery(
     names: &[&str],
     weights: &mut [u32],
@@ -102,13 +104,20 @@ fn error_recovery(
     ind: usize,
     children: &[&str],
 ) {
+    // Filter out all childs that dont have the same value as the child
+    // with index try (could be done for every child)
     let filter: Vec<u32> = sums.iter()
         .filter(|&&x| x != sums[try])
         .map(|x| *x)
         .collect();
+
+    // If only(!) one of them differs from the other its the error
     if filter.len() == 1 {
         println!("Identified error in {}:", names[ind]);
         println!("childs:\t\t{:?}", sums);
+
+        // Find the node and correct it in data-structure and in the
+        // sums for the parent-structure.
         let (i, _) = sums.iter()
             .enumerate()
             .find(|&(_, &x)| x == filter[try])
@@ -121,7 +130,8 @@ fn error_recovery(
             .find(|&(_, &d)| d == error_name)
             .unwrap();
         println!("with weight:\t{}", weights[j]);
-        weights[j] += sums[try] - sums[i];
+
+        weights[j] = weights[j] + sums[try] - sums[i];
         sums[i] = sums[try];
         println!("Recovered from error!");
         println!("New weight:\t{}", weights[j]);
@@ -131,31 +141,26 @@ fn error_recovery(
 }
 
 fn traverse(names: &[&str], mut weights: &mut [u32], children: &Vec<Vec<&str>>, ind: usize) -> u32 {
-    //let mut childs_of_all_childs: Vec<Vec<u32>> = vec![];
     let mut sums: Vec<u32> = vec![];
+    // For this node (with index ind) go through all children and begin traversing for them
     for child in children[ind].iter() {
         let (i, _) = names.iter().enumerate().find(|&(_, d)| d == child).unwrap();
         let val = traverse(&names, &mut weights, &children, i);
+        // Every child's weight gets stored to sum over it and error correct
         sums.push(val);
     }
     if sums.len() > 2 {
+        //try two every recoveries if one fails because we only check one index against all other childs
         error_recovery(&names, &mut weights, &mut sums, 0, ind, &children[ind]);
         error_recovery(&names, &mut weights, &mut sums, 1, ind, &children[ind]);
     }
 
+    // The weight of this node is his weight + the weight of all his children (if any)
     let mut sum: u32 = 0;
     if sums.len() > 0 {
         sum = sums.iter().sum();
     }
     sum + weights[ind]
-}
-fn traverse_tree(
-    names: &[&str],
-    mut weights: &mut [u32],
-    children: &Vec<Vec<&str>>,
-    root_ind: usize,
-) {
-    traverse(&names, &mut weights, &children, root_ind);
 }
 fn main() {
     let mut file = File::open("input.txt").expect("Unable to open");
@@ -166,8 +171,8 @@ fn main() {
         .filter(|&d| d != '(' && d != ')' && d != ',')
         .collect::<String>();
 
+    //We divide the input data in 3 vectors. The vector of names, weights and children.
     let mut names = Vec::new();
-
     let mut weights: Vec<u32> = Vec::new();
     let children: Vec<Vec<&str>> = filter
         .lines()
@@ -181,7 +186,10 @@ fn main() {
         })
         .collect();
 
+    //children is a vector of vectors, flat children is just the vector flattend down
     let flat_children: Vec<&&str> = children.iter().flat_map(|x| x).collect();
+
+    //PART 1 + if we have the root node we can traverse easily from top to bottom
     let root_node = find_root_node(&names, &flat_children);
     println!();
     match root_node {
@@ -189,7 +197,7 @@ fn main() {
             println!("Root node is: {}!", root);
             println!();
             println!("Traversing Tree:");
-            traverse_tree(&names, &mut weights, &children, i);
+            traverse(&names, &mut weights, &children, i);
         }
         None => println!("No root node identified!"),
     };

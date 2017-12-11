@@ -55,7 +55,10 @@ fn ge(a: i32, b: i32) -> bool {
 fn gt(a: i32, b: i32) -> bool {
     !(leq(a, b))
 }
-
+//To be safe, the CPU also needs to know the highest value held in any register during this process
+// so that it can decide how much memory to allocate to these operations.
+// For example, in the above instructions,
+// the highest value ever held was 10 (in register c after the third instruction was evaluated).
 fn expr_parse<'a>(contents: &'a String, register: &mut HashMap<&'a str, i32>) -> i32 {
     let mut overall_max = 0;
     for line in contents.lines() {
@@ -63,17 +66,21 @@ fn expr_parse<'a>(contents: &'a String, register: &mut HashMap<&'a str, i32>) ->
             .filter(|&d| d != "")
             .collect::<Vec<&str>>();
 
+        //well grammar parsing would be the real way to go but thats just to much work
         let str_a = split_line[0];
         let str_operation = split_line[1];
         let arg_1_1: i32 = split_line[2].parse().unwrap();
         let str_b = split_line[4];
         let str_cmp = split_line[5];
         let arg_2_1: i32 = split_line[6].parse().unwrap();
+
+        // there exists two operators inc and dec
         let opp = match str_operation {
             "inc" => add,
             _ => sub,
         };
 
+        // there exists 6 different PartialOrd
         let cmp = match str_cmp {
             "<" => lt,
             ">" => gt,
@@ -86,10 +93,15 @@ fn expr_parse<'a>(contents: &'a String, register: &mut HashMap<&'a str, i32>) ->
         //add unknown variables to register
         register.entry(str_a).or_insert(0);
         register.entry(str_b).or_insert(0);
+
+        //basically if f < 124
         if cmp(*register.get(str_b).unwrap(), arg_2_1) {
+            // do x inc 24 in the hash
             let mut x = register.get_mut(str_a).unwrap();
             let new_val = opp(*x, arg_1_1);
             *x = new_val;
+
+            //PART 2
             if (new_val > overall_max) {
                 overall_max = new_val
             }
