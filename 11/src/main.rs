@@ -65,12 +65,12 @@ fn detect_same_sign(shortest_path: &mut [i32], _diag1: usize, _diag2: usize, k: 
     let mut ksign = 1;
     if shortest_path[i].signum() == shortest_path[j].signum() {
         let min = (shortest_path[i].abs()).min(shortest_path[j].abs());
-        if (shortest_path[i] >= 0) {
+        if (shortest_path[i] < 0) {
             ksign = -1;
         }
-        shortest_path[i] += ksign * min;
-        shortest_path[j] += ksign * min;
-        shortest_path[k] -= ksign * min;
+        shortest_path[i] -= ksign * min;
+        shortest_path[j] -= ksign * min;
+        shortest_path[k] += ksign * min;
     }
 }
 
