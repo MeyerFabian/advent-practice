@@ -47,7 +47,7 @@ fn shortest_path_alg(words: &[&str]) -> Vec<i32> {
     // Note: There exists no east and west directions
     // for which this also would hold!
     // We detect this by looking at equal signs of nw and ne direction.
-    detect_same_sign(&mut shortest_path, 0, 2, 1);
+    detect_same_sign(&mut shortest_path, 1, 0, 2);
 
     // And Secondly:
     // n/s can be combined with se/ne or sw/nw to create ne/se or nw/sw
@@ -59,7 +59,7 @@ fn shortest_path_alg(words: &[&str]) -> Vec<i32> {
     shortest_path
 }
 
-fn detect_same_sign(shortest_path: &mut [i32], _diag1: usize, _diag2: usize, k: usize) {
+fn detect_same_sign(shortest_path: &mut [i32], _north: usize, _diag1: usize, _diag2: usize,) {
     let mut i = _diag1;
     let mut j = _diag2;
     let mut ksign = 1;
@@ -70,13 +70,13 @@ fn detect_same_sign(shortest_path: &mut [i32], _diag1: usize, _diag2: usize, k: 
         }
         shortest_path[i] -= ksign * min;
         shortest_path[j] -= ksign * min;
-        shortest_path[k] += ksign * min;
+        shortest_path[_north] += ksign * min;
     }
 }
 
-fn detect_different_sign(shortest_path: &mut [i32], _north: usize, _j: usize, k: usize) {
+fn detect_different_sign(shortest_path: &mut [i32], _north: usize, _diag1: usize, _diag2: usize) {
     let mut i = _north;
-    let mut j = _j;
+    let mut j = _diag1;
     let mut ksign = 1;
     if shortest_path[i].signum() != shortest_path[j].signum() {
         let min = (shortest_path[i].abs()).min(shortest_path[j].abs());
@@ -88,7 +88,7 @@ fn detect_different_sign(shortest_path: &mut [i32], _north: usize, _j: usize, k:
         }
         shortest_path[i] -= min;
         shortest_path[j] += min;
-        shortest_path[k] += ksign * min;
+        shortest_path[_diag2] += ksign * min;
     }
 }
 
