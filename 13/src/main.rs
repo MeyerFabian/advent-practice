@@ -55,10 +55,7 @@ fn main() {
 
     //PART 2
     let mut delay = 0;
-    loop {
-        if !caught_packet_scanner(&v, delay) {
-            break;
-        }
+    while caught_packet_scanner(&v,delay){
         delay += 1;
     }
     println!("{}", delay);

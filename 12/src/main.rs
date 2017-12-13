@@ -97,14 +97,12 @@ fn nodes_connected(g: &UnGraphMap<u32, u32>, node: u32) -> Vec<u32> {
 fn group_count(g: &UnGraphMap<u32, u32>) -> usize {
     let mut nodes = g.nodes().collect::<Vec<u32>>();
     let mut group_count = 0;
-    loop {
+    while let Some(node) =nodes.pop(){
         group_count += 1;
 
         // We take the first node out of the graph and do a bfs for all its connected nodes.
-        let mut group = Vec::new();
-        if let Some(node) = nodes.iter().next() {
-            group = nodes_connected(&g, *node);
-        }
+        let group = Vec::new();
+        group = nodes_connected(&g, node);
 
         // Then we filter out all nodes that were in that group from all left graph nodes.
         // Were left with all nodes that havent been traversed ones with bfs.
@@ -115,10 +113,6 @@ fn group_count(g: &UnGraphMap<u32, u32>) -> usize {
             .collect::<Vec<u32>>();
         nodes = filtered_notes;
 
-        // If we traversed through every node of the graph we stop.
-        if nodes.len() == 0 {
-            break;
-        }
     }
     group_count
 }
