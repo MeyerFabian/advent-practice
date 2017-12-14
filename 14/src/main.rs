@@ -39,7 +39,10 @@ fn main() {
     let mut region_index =1;
 
     //PART 2
-    // puh this will take some time
-    // region growing algorithms :/
+    // puh this will take to much time
+    // i will omit this part because i know how to it
+    // and the whole algorithm can be seen on wikipedia anyway
+    // https://en.wikipedia.org/wiki/Connected-component_labeling
     println!("{}", sum);
+    println!("{}",grid[0][0]);
 }
